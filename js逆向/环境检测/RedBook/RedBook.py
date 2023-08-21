@@ -1,12 +1,17 @@
 import json
 import os
+import csv
+import hashlib
 import random
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor
 from hashlib import md5
 from urllib.parse import urlencode
+import subprocess
+from functools import partial
 
+subprocess.Popen = partial(subprocess.Popen, encoding="utf-8")
 import execjs
 import requests
 
@@ -34,10 +39,10 @@ class RedBook:
             'content-type': 'application/json;charset=UTF-8',
             'accept': 'application/json, text/plain, */*',
             'accept-language': 'zh-CN,zh;q=0.9',
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0',
         }
         self.cookies = {
-            'web_session': '030037a32da2185cdbc220b066234a318a6aa2',
+            'web_session': '040069b0fa72171228cc996eea364b87983727',
         }
         if cookie:
             self.flag = 1
@@ -570,23 +575,59 @@ class RedBook:
         return execjs.compile(open('./new/jssss.js', 'r', encoding='utf-8').read()) \
             .call('XsXt', e, t)
 
-
+    def file_write(self,items,Author):
+        if not os.path.exists(r"C:/Users/86187/Desktop/work/xhs/{}".format(Author)):
+            os.makedirs(r"C:/Users/86187/Desktop/work/xhs/{}".format(Author))
+        with open(r"C:/Users/86187/Desktop/work/xhs/" + Author + '/index.csv', 'w', encoding='utf-8', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(['md5','title','link'])
+            for item in items:
+                url = 'https://www.xiaohongshu.com/explore/'+item['note_id']
+                title = item['display_title']
+                md5str = hashlib.new("md5", url.encode(encoding="UTF-8")).hexdigest()
+                writer.writerow([md5str, title, url])
+                if not os.path.exists(r"C:/Users/86187/Desktop/work/xhs/{}/{}.txt".format(Author, md5str)):
+                    note = self.get_note_detail(item['note_id'])
+                    news_content = note.get('desc')
+                    with open(r"C:/Users/86187/Desktop/work/xhs/{}/{}.txt".format(Author, md5str), 'w', encoding='utf-8',
+                              newline='') as f:
+                        f.write(news_content)
+        f.close()
+    # 根据用户ID获取用户信息并导出
+    def get_user_info(self, user_id):
+        items = self.get_user_page(user_id)
+        self.file_write(items,'阿那亚民宿薇恩小院')
 if __name__ == '__main__':
     cookies = {
-
+        "a1":"1875a6c13bb3broh7gh4kb08cwybgf0907lllqz8u50000209022",
+        "abRequestId":"cefa105e7ee3a195ba37464353521e51",
+        "gid":"yYW20KSyqJ8WyYW20KSyqWAuDDqDFlxWkx4T1Y7D8YSEv128Dki8j1888J8j8JJ8SKJSKY4Y",
+        "gid.sign":"JIJhG4tmzA4xTbIcQG81bf+wEcU",
+        "gid.ss":"gSMQ9UOnDuZwH2oRGJG6BW6e4grs67TaYpnrW+8Wmd1pVySTNt2/r46Te7oMD3Wl",
+        "sec_poison_id":"d5a2b7c3-ad59-4a92-ad43-d8bdc7229fef",
+        "timestamp2":"16728192365348f767bd6d52b423e3fd3ff22458dacce846506bafb3e4e475b",
+        "timestamp2.sig":"7VxVMCB0-xaQgiiUera4SPxPfbk-TCFV4OtO0DAuDLE",
+        "web_session":"040069b0fa72171228cc996eea364b87983727",
+        "webBuild":"3.5.0",
+        "webId":"cefa105e7ee3a195ba37464353521e51",
+        "websectiga":"10f9a40ba454a07755a08f27ef8194c53637eba4551cf9751c009d9afb564467",
+        "xhsTrackerId":"0bf93526-62c5-44a3-a6f0-37609577c913",
+        "xhsTrackerId.sig":"bb58EkTxVmaYdMC6Ah6ZIHNVFjFVf0ZokTsa5df6YpA",
+        "xsecappid":"xhs-pc-web"
     }
     red_book = RedBook(cookies)
     # red_book.like_or_dislike('6339534a000000001d010a74', 0)
     # items = red_book.search_user('易梦玲')
     # items = red_book.get_note_comment('6429108000000000130020d2')
-    # items = red_book.get_user_page('562f8c8ef53ee026a3c94b5e')
+    # items = red_book.get_user_page('5a09498311be102d702453a7')
     # items = red_book.get_homepage()
     # items = red_book.search_notes('iu')
     # items = red_book.search_topic('iu')  # 5be1b807ad586500019ce2d8
     # items = red_book.search_by_topic('5d39bbf46330d90001dc6000', 1)
     # for i in items:
     #     print(i)
-    # note = red_book.get_note_detail('64a8925600000000230358af')
+    # note = red_book.get_note_detail('64a2a7db000000002b038d0a')
     # print(note)
     # topic = red_book.get_note_topic('6326a0910000000008009209')
     # print(topic)
+    red_book.get_user_info('5a09498311be102d702453a7')

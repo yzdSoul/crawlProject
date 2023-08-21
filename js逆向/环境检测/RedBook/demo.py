@@ -5,7 +5,7 @@ from random import uniform
 from time import sleep
 from typing import Union, Literal, Generator
 
-from curl_cffi import requests
+import requests
 
 # 类型控制
 Accept = Literal['json', 'text', 'contents']
@@ -18,7 +18,22 @@ class Base:
     # 请求头
     headers: dict = {}
     # 用户cookie
-    cookies: dict = {}
+    cookies: dict = {'a1':"1875a6c13bb3broh7gh4kb08cwybgf0907lllqz8u50000209022",
+        'abRequestId':"cefa105e7ee3a195ba37464353521e51",
+        'acw_tc':	"c8433559cfd44191c11555e80eb8b17fdb117c426b74cbf49d46a77d38a70779",
+        'gid':	"yYW20KSyqJ8WyYW20KSyqWAuDDqDFlxWkx4T1Y7D8YSEv128Dki8j1888J8j8JJ8SKJSKY4Y",
+        'gid.sign':	"JIJhG4tmzA4xTbIcQG81bf+wEcU=",
+        'gid.ss'	:"gSMQ9UOnDuZwH2oRGJG6BW6e4grs67TaYpnrW+8Wmd1pVySTNt2/r46Te7oMD3Wl",
+        'sec_poison_id':	"8df69828-06ec-487f-bc18-f8bf3e9968ee",
+        'timestamp2'	:"16728192365348f767bd6d52b423e3fd3ff22458dacce846506bafb3e4e475b",
+        'timestamp2.sig':	"7VxVMCB0-xaQgiiUera4SPxPfbk-TCFV4OtO0DAuDLE",
+       'web_session':	"040069b0fa72171228cc996eea364b87983727",
+        'webBuild':	"3.5.0",
+        'webId':	"cefa105e7ee3a195ba37464353521e51",
+        'websectiga'	:"cf46039d1971c7b9a650d87269f31ac8fe3bf71d61ebf9d9a0a87efb414b816c",
+        'xhsTrackerId':"0bf93526-62c5-44a3-a6f0-37609577c913",
+        "xhsTrackerId.sig":"bb58EkTxVmaYdMC6Ah6ZIHNVFjFVf0ZokTsa5df6YpA",
+        'xsecappid':"xhs-pc-web"}
     # 返回指定数据类型
     dataProcessors = {
         'json': lambda resp: resp.json(),
@@ -258,15 +273,36 @@ class NotRequiredRedBook(Base):
             }
             yield item
 
+    def get_user_page(self, user_id):
+        continuations = ['']
+        e = '/api/sns/web/v1/user_posted?'
+        url = 'https://edith.xiaohongshu.com/api/sns/web/v1/user_posted'
+        while continuations:
+            continuation = continuations.pop()
+            params = {
+                'num': '30',
+                'cursor': continuation,
+                'user_id': user_id,
+            }
+            # 发送请求
+            resp = self.ajax_requests(url=url, params=params, path=e)
+            has_more = resp.get('data', {}).get('has_more')
+            # 存在下一页就翻页
+            if has_more:
+                continuations.append(resp['data']['cursor'])
+            data = resp.get('data', {}).get('notes')
+            if data:
+                yield from self.get_note(data)
+            time.sleep(random.uniform(1, 5))
 
 if __name__ == '__main__':
     my_book = NotRequiredRedBook()
-    items = my_book.search_by_topic('5d39bbf46330d90001dc6000', 0)
+    # items = my_book.search_by_topic('5d39bbf46330d90001dc6000', 0)
     # items = my_book.search_topic('iu')
     # items = my_book.search_user('iu')
-    for i in items:
-        print(i)
+    # for i in items:
+    #     print(i)
     # topic = my_book.get_note_topic('64d22943000000000b02b559')
     # print(topic)
-    # note = my_book.get_note_by_id('64d23025000000000c0370b9')
+    # note = my_book.get_note_by_id('64a2a7db000000002b038d0a')
     # print(note)

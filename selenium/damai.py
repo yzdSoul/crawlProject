@@ -15,8 +15,9 @@ class Concert:
     def __init__(self):
         self.status = 0
         self.login_method = 1
-        self.driver = webdriver.Chrome(executable_path='./chromedriver.exe')
-
+        options = webdriver.ChromeOptions()
+        self.driver = webdriver.Chrome(executable_path='D:/Program Files/Python/Python36/Scripts/chromedriver.exe')
+        # self.driver = webdriver.Chrome(options=options)
     def set_cookie(self):
         self.driver.get(damai_url)
         print("###请点击登录###")

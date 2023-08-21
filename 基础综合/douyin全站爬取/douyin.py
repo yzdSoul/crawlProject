@@ -11,7 +11,7 @@ class Douyin:
             'authority': 'www.douyin.com',
             'referer': 'https://www.douyin.com/',
             'sec-fetch-site': 'same-origin',
-            'cookie': '',
+            'cookie': 'install_id=1042781762500062; ttreq=1$cc3dc5ac70392e99f94339e57cab8249dc960b46; passport_csrf_token_default=a6782c2ba4839b316ad150c6878dbe1d; d_ticket=cd5a29e9ebee5114f05e15c46cb5ba2d0fa58; odin_tt=8b3c22b4775558c0f19c349bc08a4ba70cd36441e2f45d4a1c1d98f148e2970d64bfdcf6f05f2925883343c77ebbdc0017133d3b04d99ea1bb8a432111eb5f10944c87e4fc48c53a38a4228a8760fc9b; n_mh=b-5xGsfiwpt9KBxCysZrq43ogpP8Nmi9YM2uNsiSNI0; sid_guard=48331e84d03b31144c43d552d711465c%7C1652082981%7C5183999%7CFri%2C+08-Jul-2022+07%3A56%3A20+GMT; uid_tt=ba1cf837387b7524b4f4a305975582cc; sid_tt=48331e84d03b31144c43d552d711465c; sessionid=cefdc5e9e80049990726472ffa9164c1',
             'pragma': 'no-cache',
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
         }
@@ -389,6 +389,6 @@ if __name__ == '__main__':
     # 获取用户信息
     # print(dou.get_user('MS4wLjABAAAA0fiq261i6th1gRCsGrZ6SRxCT9DdEz3aJ5nBRnR14N0'))
     # 获取用户帖子
-    # items = dou.get_user_post('MS4wLjABAAAA0fiq261i6th1gRCsGrZ6SRxCT9DdEz3aJ5nBRnR14N0')
-    # for item in islice(items, 1):
-    #     print(item)
+    items = dou.get_user_post('MS4wLjABAAAA0fiq261i6th1gRCsGrZ6SRxCT9DdEz3aJ5nBRnR14N0')
+    for item in islice(items, 1):
+        print(item)
