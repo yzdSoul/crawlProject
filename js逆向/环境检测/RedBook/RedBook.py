@@ -597,6 +597,24 @@ class RedBook:
     def get_user_info(self, user_id):
         items = self.get_user_page(user_id)
         self.file_write(items,'阿那亚民宿薇恩小院')
+    # 根据用户ID获取用户信息并导出
+    def download_img_by_note(self,note_id):
+        root_path = r"D:/xhs"
+        note = self.get_note_detail(note_id)
+        user_name = note['user_name']
+        title = note['title']
+        if not os.path.exists(r"{}/{}".format(root_path,user_name)):
+            os.makedirs(r"{}/{}".format(root_path,user_name))
+        if not os.path.exists(r"{}/{}/{}".format(root_path,user_name,title)):
+            os.makedirs(r"{}/{}/{}".format(root_path,user_name,title))
+        img_list = note['img_list']
+        for img in img_list:
+            result = requests.get(img,timeout=10)
+            if result.status_code == 200:
+                with open(r"D:/xhs/{}/{}/{}".format(user_name,title,img.split('/')[-1])+'.jpg','wb') as f:
+                    f.write(result.content)
+                    print(img)
+        f.close()
 if __name__ == '__main__':
     cookies = {
         "a1":"1875a6c13bb3broh7gh4kb08cwybgf0907lllqz8u50000209022",
@@ -630,4 +648,5 @@ if __name__ == '__main__':
     # print(note)
     # topic = red_book.get_note_topic('6326a0910000000008009209')
     # print(topic)
-    red_book.get_user_info('5a09498311be102d702453a7')
+    # red_book.get_user_info('5a09498311be102d702453a7')
+    red_book.download_img_by_note('64ce6839000000000800c865')
