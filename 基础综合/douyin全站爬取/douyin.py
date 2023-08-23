@@ -1,7 +1,7 @@
 import csv
 import time
 from itertools import islice
-
+import os
 import requests
 
 
@@ -259,7 +259,7 @@ class Douyin:
         share_count = post.get('statistics').get('share_count')
         collect_count = post.get('statistics').get('collect_count')
         region = post.get('region')
-
+        author = post.get('author')
         yield {
             'aweme_id': aweme_id,
             'desc': desc,
@@ -272,7 +272,8 @@ class Douyin:
             'liked': liked,
             'comment_count': comment_count,
             'collect_count': collect_count,
-            'share_count': share_count
+            'share_count': share_count,
+            'author': author,
         }
 
     # 获取用户信息
@@ -341,19 +342,23 @@ class Douyin:
 
     # 下载某一个帖子内容
     def download(self, item):
+        root_path = 'D:/TikTok/'
+        aurthor_path = root_path + item['author']['nickname'] + '/'
+        if not os.path.exists(aurthor_path):
+            os.makedirs(aurthor_path)
         for _ in range(5):
             try:
                 if item['type'] == 'photo':
                     flag = 0
                     for url in item['link']:
-                        path = f'./Lib/{item["aweme_id"]}{"aa" + str(flag)}.jpg'
+                        path = f'{aurthor_path}{item["aweme_id"]}{"aa" + str(flag)}.jpg'
                         with open(path, 'wb') as fp:
                             fp.write(requests.get(url, headers=self.headers, timeout=10).content)
                         print(path)
                         flag += 1
                     return True
                 else:
-                    path = f'./Lib/{item["aweme_id"]}.mp4'
+                    path = f'{aurthor_path}{item["aweme_id"]}.mp4'
                     with open(path, 'wb') as fp:
                         fp.write(requests.get(item['link'], headers=self.headers, timeout=10).content)
                     print(path)
@@ -389,6 +394,8 @@ if __name__ == '__main__':
     # 获取用户信息
     # print(dou.get_user('MS4wLjABAAAA0fiq261i6th1gRCsGrZ6SRxCT9DdEz3aJ5nBRnR14N0'))
     # 获取用户帖子
-    items = dou.get_user_post('MS4wLjABAAAA0fiq261i6th1gRCsGrZ6SRxCT9DdEz3aJ5nBRnR14N0')
+    # items = dou.get_user_post('MS4wLjABAAAA0fiq261i6th1gRCsGrZ6SRxCT9DdEz3aJ5nBRnR14N0')
+    items = dou.get_user_post('MS4wLjABAAAAmr3ZcrNc1CfyS52OsV7SSUiMKCY6WZElKzOJAg52G5Q')
     for item in islice(items, 1):
+        dou.download(item)
         print(item)
