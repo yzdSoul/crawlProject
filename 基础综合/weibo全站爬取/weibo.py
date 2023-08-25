@@ -8,6 +8,8 @@ from time import sleep
 from typing import Union, Generator
 from urllib.parse import urlparse, parse_qs
 
+import requests
+
 from 基础综合.weibo全站爬取.base import Base
 
 
@@ -198,13 +200,14 @@ class WeiBo(Base):
                 _path = f'./sourceLib/{name[0:10]}.mp4'
             else:
                 _path = f'./sourceLib/{name}'
-            sourceBytes = self.ajax_requests(
-                url=_url,
-                method='get',
-                dataType='contents',
-                params=None,
-                jsonData=None
-            )
+            # sourceBytes = self.ajax_requests(
+            #     url=_url,
+            #     method='get',
+            #     dataType='contents',
+            #     params=None,
+            #     jsonData=None,
+            # )
+            sourceBytes = self.img_download(_url)
             with open(_path, 'wb') as fp:
                 fp.write(sourceBytes)
                 print(_url)
@@ -350,10 +353,52 @@ class WeiBo(Base):
             'gender': user.get('gender'),
         }
 
+    def img_download(self,url):
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0',
+            'Accept': 'image/avif,image/webp,*/*',
+            'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+            # 'Accept-Encoding': 'gzip, deflate, br',
+            'Referer': 'https://m.weibo.cn/',
+            'Sec-Fetch-Dest': 'image',
+            'Sec-Fetch-Mode': 'no-cors',
+            'Sec-Fetch-Site': 'cross-site',
+            'Connection': 'keep-alive',
+            # Requests doesn't support trailers
+            # 'TE': 'trailers',
+        }
 
+        response = requests.get(url=url, headers=headers)
+        img = response.content
+        # with open('1.jpg', 'wb') as f:
+        #     f.write(img)
+        return img
 if __name__ == '__main__':
-    headers = {}
-    cookies = {}
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0",
+        "Host": "m.weibo.cn",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Referer": "https://m.weibo.cn/",
+        "X-Requested-With": "XMLHttpRequest",
+        "MWeibo-Pwa": "1",
+        "X-XSRF-TOKEN": "88ae1b",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
+        "Connection": "keep-alive",
+        "Cookie": "SUB=_2A25J40mODeRhGeFG7VcZ9irJzDSIHXVrLFfGrDV6PUJbkdCOLRT-kW1NeQxdFgbFv8h_QHpaCpeFuNqNmwlerVxw; WEIBOCN_FROM=1110006030; _T_WM=59077067571; XSRF-TOKEN=be3539; mweibo_short_token=b5b5c06b70; MLOGIN=1; M_WEIBOCN_PARAMS=luicode%3D20000174%26uicode%3D20000174"
+    }
+    cookies = {
+        "_T_WM": "59077067571",
+        "M_WEIBOCN_PARAMS": "luicode=20000174&uicode=20000174",
+        "MLOGIN": "1",
+        "mweibo_short_token": "b5b5c06b70",
+        "SUB": "_2A25J40mODeRhGeFG7VcZ9irJzDSIHXVrLFfGrDV6PUJbkdCOLRT-kW1NeQxdFgbFv8h_QHpaCpeFuNqNmwlerVxw",
+        "WEIBOCN_FROM": "1110006030",
+        "XSRF-TOKEN": "be3539"
+    }
     weibo = WeiBo(headers=headers, cookies=cookies)
     # 用户相册
     # items = w.user_photo_album('7690783385')
@@ -369,9 +414,10 @@ if __name__ == '__main__':
     # 保存评论
     # weibo.save_comments_to_csv(4931686942905084)
     # 保存相片
-    # weibo.save_user_photo('7690783385')
+    weibo.save_user_photo('7690783385')
 
     # 帖子详情
     # print(weibo.post_info(4931686942905084))
     # 精确搜索用户
     # print(weibo.get_user_info_by_id('7690783385'))
+    # weibo.img_download()
